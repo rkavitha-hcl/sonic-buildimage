@@ -117,6 +117,8 @@ void RebootThread::do_reboot(void) {
 
   if (m_request.method() == RebootMethod::COLD) {
     do_cold_reboot(s);
+  } else if (m_request.method() == RebootMethod::HALT) {
+    do_halt_reboot(s);
   } else if (m_request.method() == RebootMethod::WARM) {
     do_warm_reboot(s);
   } else {
@@ -167,6 +169,25 @@ void RebootThread::do_cold_reboot(swss::Select &s) {
 
   // Set critical state
   // m_critical_interface.report_critical_state("platform failed to reboot");
+  return;
+}
+
+void RebootThread::do_halt_reboot(swss::Select &s) {
+  SWSS_LOG_ENTER();
+  SWSS_LOG_NOTICE("Sending halt reboot request to platform");
+  if (send_dbus_reboot_request() == Progress::EXIT_EARLY) {
+    return;
+  }
+
+  // Wait for platform to reboot. If we return, reboot failed.
+  // Logging, error status and monitoring for critical state are handled within.
+  if (wait_for_platform_reboot(s) == Progress::EXIT_EARLY) {
+    return;
+  }
+
+  // We shouldn't be here. Platform reboot should've killed us.
+  log_error_and_set_non_retry_failure("platform failed to reboot");
+
   return;
 }
 

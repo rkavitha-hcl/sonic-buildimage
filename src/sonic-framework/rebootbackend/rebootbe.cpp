@@ -161,6 +161,8 @@ NotificationResponse RebootBE::HandleRebootRequest(
   if (response.status == swss::StatusCode::SWSS_RC_SUCCESS) {
     if (request.method() == gnoi::system::RebootMethod::COLD) {
       SetCurrentStatus(RebManagerStatus::COLD_REBOOT_IN_PROGRESS);
+    } else if (request.method() == gnoi::system::RebootMethod::HALT) {
+      SetCurrentStatus(RebManagerStatus::HALT_REBOOT_IN_PROGRESS);
     } else if (request.method() == gnoi::system::RebootMethod::WARM) {
       SetCurrentStatus(RebManagerStatus::WARM_REBOOT_IN_PROGRESS);
     }
@@ -172,6 +174,7 @@ bool RebootBE::RebootAllowed(const gnoi::system::RebootMethod rebMethod) {
   RebManagerStatus current_status = GetCurrentStatus();
   switch (current_status) {
     case RebManagerStatus::COLD_REBOOT_IN_PROGRESS:
+    case RebManagerStatus::HALT_REBOOT_IN_PROGRESS:
     case RebManagerStatus::WARM_REBOOT_IN_PROGRESS: {
       return false;
     }
