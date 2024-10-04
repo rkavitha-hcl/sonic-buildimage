@@ -180,6 +180,8 @@ NotificationResponse RebootBE::handle_reboot_request(
   if (response.status == swss::StatusCode::SWSS_RC_SUCCESS) {
     if (request.method() == gnoi::system::RebootMethod::COLD) {
       SetCurrentStatus(NsfManagerStatus::COLD_REBOOT_IN_PROGRESS);
+    } else if (request.method() == gnoi::system::RebootMethod::HALT) {
+      SetCurrentStatus(NsfManagerStatus::HALT_REBOOT_IN_PROGRESS);
     } else if (request.method() == gnoi::system::RebootMethod::NSF) {
       SetCurrentStatus(NsfManagerStatus::NSF_REBOOT_IN_PROGRESS);
     }
@@ -191,6 +193,7 @@ bool RebootBE::reboot_allowed(const gnoi::system::RebootMethod reboot_method) {
   NsfManagerStatus current_status = GetCurrentStatus();
   switch (current_status) {
     case NsfManagerStatus::COLD_REBOOT_IN_PROGRESS:
+    case NsfManagerStatus::HALT_REBOOT_IN_PROGRESS:
     case NsfManagerStatus::NSF_REBOOT_IN_PROGRESS: {
       return false;
     }
