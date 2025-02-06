@@ -185,8 +185,8 @@ void RebootThread::do_halt_reboot(swss::Select &s) {
     return;
   }
 
-  // We shouldn't be here. Platform reboot should've killed us.
-  log_error_and_set_non_retry_failure("platform failed to reboot");
+  // We shouldn't be here. Platform reboot halt should've killed us.
+  log_error_and_set_non_retry_failure("platform failed to halt the system");
 
   return;
 }
@@ -227,6 +227,7 @@ bool RebootThread::check_start_preconditions(const RebootRequest &request,
     response.json_string = "RebootThread: can't Start while active";
     response.status = swss::StatusCode::SWSS_RC_IN_USE;
   } else if (request.method() != RebootMethod::COLD &&
+             request.method() != RebootMethod::HALT &&
              request.method() != RebootMethod::WARM) {
     response.json_string = "RebootThread: Start rx'd unsupported method";
     response.status = swss::StatusCode::SWSS_RC_INVALID_PARAM;

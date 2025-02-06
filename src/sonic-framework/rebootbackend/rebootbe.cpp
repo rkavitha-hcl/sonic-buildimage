@@ -149,7 +149,7 @@ NotificationResponse RebootBE::HandleRebootRequest(
   if (!RebootAllowed(request.method())) {
     response.status = swss::StatusCode::SWSS_RC_IN_USE;
     response.json_string =
-        "Reboot not allowed at this time. Reboot or "
+        "Reboot not allowed at this time. Reboot, halt or "
         "post-warmboot in progress";
     SWSS_LOG_WARN("%s", response.json_string.c_str());
     return response;
